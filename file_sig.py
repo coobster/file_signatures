@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup as bs
 
 def get_mime(filename):
 	data = open(filename,'r+b').read(32)
-	if not mime_list:
-		mime_list = download_list()
 	for m in mime_list:
 		if type(m[0]) == list:
 			for i in m[0]:
@@ -26,3 +24,5 @@ def download_list():
 		if '\n' in mime[i][0]:
 			mime[i][0] = [o for o in mime[i][0].split('\n') if o]
 	return mime
+
+mime_list = download_list()
