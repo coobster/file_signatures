@@ -9,6 +9,26 @@
 from requests import get
 from bs4 import BeautifulSoup as bs
 
+def download_list():
+	###############################################
+	#  download_list funtion returns a list with all the 
+	#  known mimetypes from the wikipedia page about file_signatures
+	#	https://en.wikipedia.org/wiki/List_of_file_signatures
+	#  May not work if wikipedia changes the style of
+	#  the webpage (however unlikely that is to occur).
+	###############################################
+	url = 'https://en.wikipedia.org/wiki/List_of_file_signatures'
+	r = get(url)
+	soup = bs(r.content)
+	tables = soup.find_all('table')
+	mime = [[td.text.strip('\n') for td in tr.findAll('td')] for tr in tables[-2].findAll('tr')]
+	mime = [i for i in mime if i]
+	for i in range(len(mime)):
+		mime[i][0] = mime[i][0].replace(' ','')
+		if '\n' in mime[i][0]:
+			mime[i][0] = [o for o in mime[i][0].split('\n') if o]
+	return mime
+
 def get_mime(filename, mime_list = download_list()):
 	##############################################
 	#  get_mime function opens and checks the file given and 
@@ -27,22 +47,3 @@ def get_mime(filename, mime_list = download_list()):
 			if data.hex().upper()[:len(m[0].upper())] == m[0].upper():
 				return m[4]
 	return None
-
-def download_list():
-	###############################################
-	#  download_list funtion returns a list with all the 
-	#  known mimetypes from the wikipedia page about file_signatures
-	#	https://en.wikipedia.org/wiki/List_of_file_signatures
-	#  May not work if wikipedia changes the style of
-	#  the webpage (however unlikely that is to occur).
-	###############################################
-	url = 'https://en.wikipedia.org/wiki/List_of_file_signatures'
-	r = get(url)
-	soup = bs(r.content)
-	mime = [[td.text.strip('\n') for td in tr.findAll('td')] for tr in soup.table.findAll('tr')]
-	mime = [i for i in mime if i]
-	for i in range(len(mime)):
-		mime[i][0] = mime[i][0].replace(' ','')
-		if '\n' in mime[i][0]:
-			mime[i][0] = [o for o in mime[i][0].split('\n') if o]
-	return mime
